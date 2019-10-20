@@ -1,7 +1,3 @@
-// let companies;
-// let products;
-// let offerings;
-
 const grabCompanies = () => new Promise((res, rej) => {
   return window.fetch('https://acme-users-api-rev.herokuapp.com/api/companies')
           .then(response => response.json())
@@ -33,9 +29,6 @@ const grabOfferings = () => new Promise((res, rej) => {
           .catch(e => rej(e));
 })
 
-// grabCompanies();
-// grabOfferings();
-// grabProducts();
 
 const grabCompaniesResult = grabCompanies();
 const grabProductsResult = grabProducts();
