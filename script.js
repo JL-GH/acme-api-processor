@@ -3,7 +3,6 @@ const grabCompanies = () => new Promise((res, rej) => {
           .then(response => response.json())
           .then(jsonData => {
             res(jsonData)
-            companies = jsonData
           })
           .catch(e => rej(e));
 })
@@ -13,7 +12,6 @@ const grabProducts = () => new Promise((res, rej) => {
           .then(response => response.json())
           .then(jsonData => {
             res(jsonData)
-            products = jsonData
           })
           .catch(e => rej(e));
 })
@@ -24,7 +22,6 @@ const grabOfferings = () => new Promise((res, rej) => {
           .then(response => response.json())
           .then(jsonData => {
             res(jsonData)
-            offerings = jsonData
           })
           .catch(e => rej(e));
 })
@@ -51,7 +48,7 @@ Promise.all([grabCompaniesResult, grabProductsResult, grabOfferingsResult])
 
     const processedOfferings = processOfferings({companies, products, offerings})
     console.log('---------processedOfferings----------')
-    console.log (processedOfferings)
+    console.log(processedOfferings)
 
     const threeOrMoreOfferings = companiesByNumberOfOfferings(companies, offerings, 3)
     console.log('---------threeOrMoreOfferings----------')
@@ -75,30 +72,32 @@ const findProductsInPriceRange = (arrProd, objMinMax) => {
 
 
 const groupCompaniesByLetter = arrComp => {
-  return arrComp.reduce((accu, curVal) => {
+  return arrComp.reduce((groupedLetterObj, curVal) => {
     let key = curVal.name[0];
 
-    if (!(key in accu)) {
-      accu[key] = [curVal.name]
+    //Was not sure if you want the entire obj or just the company name. But to get get the entire company obj, will need to remove the .name form the curVal.
+    if (!(key in groupedLetterObj)) {
+      groupedLetterObj[key] = [curVal.name]
     }
     else {
-      accu[key] = accu[key].concat([curVal.name])
+      groupedLetterObj[key] = groupedLetterObj[key].concat([curVal.name])
     }
-    return accu
+    return groupedLetterObj
   }, {})
 }
 
 const groupCompaniesByState = arrComp => {
-  return arrComp.reduce((accu, curVal) => {
+  return arrComp.reduce((groupedStateObj, curVal) => {
     let key = curVal.state;
 
-    if (!(key in accu)) {
-      accu[key] = [curVal.name]
+    //Was not sure if you want the entire obj or just the company name. But to get get the entire company obj, will need to remove the .name form the curVal.
+    if (!(key in groupedStateObj)) {
+      groupedStateObj[key] = [curVal.name]
     }
     else {
-      accu[key] = accu[key].concat([curVal.name])
+      groupedStateObj[key] = groupedStateObj[key].concat([curVal.name])
     }
-    return accu
+    return groupedStateObj
   }, {})
 }
 
@@ -125,16 +124,16 @@ const processOfferings = objOfArrPromResults => {
 
 const companiesByNumberOfOfferings = (arrComp, arrOffer, num) => {
   //declare a obj dictionary where I can reference all companyIds that have X number of offerings
-  let compOffCount = arrOffer.reduce((accu, curVal) => {
+  let compOffCount = arrOffer.reduce((compIdDict, curVal) => {
     let compId = curVal.companyId
     // let counter = 0
-    if (!(compId in accu)) {
-      accu[compId] = 1
+    if (!(compId in compIdDict)) {
+      compIdDict[compId] = 1
     }
     else {
-      accu[compId] ++
+      compIdDict[compId]++
     }
-    return accu
+    return compIdDict
   }, {})
 
   //return the array of companies where it is greater or equal to num
@@ -156,8 +155,8 @@ const processProducts = (objOfArrProdOffers) => {
     let key = curOffering.productId
     if (!(key in accuDict)) {
       accuDict[key] = {}
-      accuDict[key]['totalSum'] = curOffering.price
-      accuDict[key]['counter'] = 1
+      accuDict[key].totalSum = curOffering.price
+      accuDict[key].counter = 1
     }
     else {
       accuDict[key].totalSum += curOffering.price
@@ -170,13 +169,13 @@ const processProducts = (objOfArrProdOffers) => {
   let keys = Object.keys(offerDict)
   for (let key of keys) {
     let curKey = offerDict[key]
-    curKey['avg'] = Number((curKey.totalSum / curKey.counter).toFixed(2))
+    curKey.avg = Number((curKey.totalSum / curKey.counter).toFixed(2))
   }
 
   //add the avgPrice of the offerings to the array of products
   arrProd.forEach((elem) => {
     if (elem.id in offerDict) {
-      elem['avgPrice'] = offerDict[elem.id].avg
+      elem.avgPrice = offerDict[elem.id].avg
     }
   })
 
